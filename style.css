@@ -22,6 +22,23 @@ h1 {
   color: var(--text-blue-color);
 }
 
+.main__list::-webkit-scrollbar {
+  width: 12px;
+}
+
+.main__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.main__list::-webkit-scrollbar-thumb {
+  background-color: rgb(222, 222, 222);
+  border-radius: 20px;
+}
+
+.done-task {
+  text-decoration: line-through;
+}
+
 .common-btn {
   border-radius: 50%;
   display: inline-flex;
@@ -59,7 +76,6 @@ h1 {
   max-width: 1512px;
   min-width: 600px;
   margin: 0 auto;
-  height: 100vh;
   display: flex;
 }
 
@@ -143,7 +159,7 @@ h1 {
 .todo__tasks {
   padding: 35px 55px;
   display: flex;
-  flex-flow: column wrap;
+  flex-flow: column;
   width: 100%;
 }
 
@@ -199,6 +215,15 @@ h1 {
   font-weight: 700;
 }
 
+.main__list {
+  overflow-y: auto;
+  max-height: 600px;
+  margin-bottom: 35px;
+  padding-right: 15px;
+  padding-left: 3px;
+  padding-top: 4px;
+}
+
 .main__list-item {
   margin-bottom: 20px;
   box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.25);
@@ -211,8 +236,13 @@ h1 {
   padding: 0 32px 0 20px;
 }
 
+.date-info {
+  margin-right: 20px;
+  color: #8e8e8e;
+}
+
 .main__list-item:last-child {
-  margin-bottom: 35px;
+  margin-bottom: 5px;
 }
 
 .main__list-item input {
