@@ -4,52 +4,72 @@ const doneBtn = document.querySelectorAll('.done-btn')
 const clearBtn = document.querySelector('.header__clear-btn')
 const sortBtn = document.querySelector('.header__sort-btn')
 const starImportantBtn = document.querySelectorAll('.star-important')
+const drawerItems = document.querySelectorAll('.todo__drawer-item')
 
 const createTaskInput = document.querySelector('.create-task-input')
 
 const taskList = document.querySelector('.task-list')
 const resolvedTasksList = document.querySelector('.resolved__tasks-list')
 
-let tasks = []
-let doneTasks = []
+let currentTab = 'freeTime'
 
-document.addEventListener('DOMContentLoaded', () => {
-  const savedTasks = parseDataFromLocalstorage('tasks') ?? []
-  const savedDoneTasks = parseDataFromLocalstorage('doneTasks') ?? []
+const data = {
+  freeTime: {
+    tasks: [],
+    doneTasks: [],
+  },
+  workTime: {
+    tasks: [],
+    doneTasks: [],
+  },
+}
 
-  ;[tasks, doneTasks] = [savedTasks, savedDoneTasks]
+let currentTabData = data[currentTab]
+
+document.addEventListener('DOMContentLoaded', renderTaskList)
+
+function renderTaskList() {
+  const allTasks = document.querySelectorAll('.main__list-item')
+  allTasks.forEach(element => {
+    element.remove()
+  })
+
+  const tasksFromLS = parseDataFromLocalstorage() ?? data
+  const { tasks, doneTasks } = tasksFromLS[currentTab]
+
+  ;[currentTabData.tasks, currentTabData.doneTasks] = [tasks, doneTasks]
 
   tasks.forEach(element => renderSimpleTask(taskList, element))
 
   doneTasks.forEach(element => {
     const taskComponent = /*html*/ `
-    <div class="main__list-item" data-id="${element.id}">
-      <p>${element.text}</p>
-      <div class="important">
-        <svg
-          class="cross-err-btn"
-          onclick="deleteTask(this, 'doneTasks')"
-          width="800px"
-          height="800px"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" />
-        </svg>
-      </div>
-    </div>
-`
+        <div class="main__list-item" data-id="${element.id}">
+          <p>${element.text}</p>
+          <div class="important">
+            <svg
+              class="cross-err-btn"
+              onclick="deleteTask(this, 'doneTasks')"
+              width="800px"
+              height="800px"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z" />
+            </svg>
+          </div>
+        </div>
+    `
     resolvedTasksList.insertAdjacentHTML('beforeend', taskComponent)
   })
-})
-
-function setDataToLocalstorage(type, arr) {
-  localStorage.setItem(`${type}`, JSON.stringify(arr))
 }
 
-function parseDataFromLocalstorage(type) {
-  return JSON.parse(localStorage.getItem(type))
+function setDataToLocalstorage(data) {
+  localStorage.setItem('data', JSON.stringify(data))
+}
+
+function parseDataFromLocalstorage() {
+  return JSON.parse(localStorage.getItem('data'))
 }
 
 function renderSimpleTask(position, element) {
@@ -72,7 +92,7 @@ function renderSimpleTask(position, element) {
       </svg>
       <svg
         class="cross-err-btn"
-        onclick="deleteTask(this)"
+        onclick="deleteTask(this, 'tasks')"
         width="800px"
         height="800px"
         viewBox="0 0 24 24"
@@ -91,13 +111,9 @@ function deleteTask(target, typeTasks) {
   const taskToDelete = target.closest('.main__list-item')
   taskToDelete.remove()
 
-  if (typeTasks === 'doneTasks') {
-    doneTasks = doneTasks.filter(el => el.id !== taskToDelete.dataset.id)
-    setDataToLocalstorage('doneTasks', doneTasks)
-  } else {
-    tasks = tasks.filter(el => el.id !== taskToDelete.dataset.id)
-    setDataToLocalstorage('tasks', tasks)
-  }
+  currentTabData[typeTasks] = currentTabData[typeTasks].filter(el => el.id !== taskToDelete.dataset.id)
+
+  setDataToLocalstorage(data)
 }
 
 function makeImportantTask(target) {
@@ -106,7 +122,7 @@ function makeImportantTask(target) {
 
   star.classList.toggle('star-important-checked')
 
-  tasks = tasks.map(element => {
+  currentTabData['tasks'] = currentTabData['tasks'].map(element => {
     if (element.id === task.dataset.id) {
       element.isImportant = !element.isImportant
     }
@@ -114,25 +130,25 @@ function makeImportantTask(target) {
     return element
   })
 
-  setDataToLocalstorage('tasks', tasks)
+  setDataToLocalstorage(data)
 }
 
 function doneTask(target) {
   const task = target.closest('.main__list-item')
   task.querySelector('.task-name').classList.toggle('done-task')
   let indexTaskToDone = null
+  let tasks = currentTabData['tasks']
 
   tasks = tasks.map((element, index) => {
     if (element.id === task.dataset.id) {
       indexTaskToDone = index
-      element.isChecked = !element.isChecked
     }
 
     return element
   })
 
   const doneTask = tasks[indexTaskToDone]
-  doneTasks.push(doneTask)
+  currentTabData['doneTasks'].push(doneTask)
   task.remove()
 
   const taskComponent = /*html*/ `
@@ -153,11 +169,10 @@ function doneTask(target) {
       </div>
     </div>
 `
-  tasks = tasks.filter(el => el.id !== doneTask.id)
+  currentTabData['tasks'] = tasks.filter(el => el.id !== doneTask.id)
 
   resolvedTasksList.insertAdjacentHTML('beforeend', taskComponent)
-  setDataToLocalstorage('tasks', tasks)
-  setDataToLocalstorage('doneTasks', tasks)
+  setDataToLocalstorage(data)
 }
 
 function createTask() {
@@ -179,10 +194,11 @@ function createTask() {
   createTaskInput.value = ''
   createTaskInput.focus()
 
-  tasks.push(taskElement)
+  currentTabData.tasks.push(taskElement)
 
-  setDataToLocalstorage('tasks', tasks)
+  setDataToLocalstorage(data)
 }
+
 // обработка клика по кнопке "Создать задачу"
 createTaskBtn.addEventListener('click', createTask)
 
@@ -208,8 +224,9 @@ clearBtn.addEventListener('click', () => {
     element.remove()
   })
 
-  tasks = []
-  doneTasks = []
+  currentTabData.tasks = []
+  currentTabData.doneTasks = []
+  setDataToLocalstorage(data)
 })
 
 // Обработка клика по "Сортировка"
@@ -219,13 +236,21 @@ sortBtn.addEventListener('click', () => {
     element.remove()
   })
 
-  tasks.reverse()
+  currentTabData.tasks.reverse()
 
-  tasks.forEach(element => renderSimpleTask(taskList, element))
-  setDataToLocalstorage('tasks', tasks)
+  currentTabData.tasks.forEach(element => renderSimpleTask(taskList, element))
+  setDataToLocalstorage(data)
 })
 
 // Обработка клика по клавише Enter во время ввода текста задачи
 createTaskInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') createTask()
+})
+
+drawerItems.forEach(item => {
+  item.addEventListener('click', () => {
+    currentTab = item.dataset.type
+    currentTabData = data[currentTab]
+    renderTaskList()
+  })
 })

@@ -16,12 +16,12 @@
     <div class="todo">
       <div class="todo__drawer">
         <button class="todo__drawer-menu-btn common-btn"><img src="/img/Menu btn.svg" alt="menu" /></button>
-        <div class="todo__drawer-item">
+        <div class="todo__drawer-item" data-type="freeTime">
           <img src="/img/Sun_light.svg" alt="free time" />
           <p>Свободное время</p>
         </div>
-        <div class="todo__drawer-item">
-          <img src="/img/Date_range_duotone_line.svg" alt="free time" />
+        <div class="todo__drawer-item" data-type="workTime">
+          <img src="/img/Date_range_duotone_line.svg" alt="work time" />
           <p>Рабочие дела</p>
         </div>
         <div class="todo__drawer-item">
@@ -35,10 +35,6 @@
         <div class="todo__drawer-item">
           <img src="/img/User_light.svg" alt="free time" />
           <p>Все задачи</p>
-        </div>
-        <div class="todo__drawer-add-catagory">
-          <span>+</span>
-          <p>добавить категорию</p>
         </div>
       </div>
       <div class="todo__tasks">
@@ -96,7 +92,6 @@
           <input type="checkbox" id="accordeon" />
           <label for="accordeon" class="footer__resolved-tasks">
             <p class="footer__title">Выполненные задачи</p>
-            <p class="resolved-tasks-count">7</p>
           </label>
           <div class="resolved__tasks-list tasks-list">
             <!-- <div class="main__list-item">
